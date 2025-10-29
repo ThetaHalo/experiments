@@ -156,13 +156,15 @@ public class Turncoat: CustomRole, IInfoResender, IRoleUI
     private void MyDeath()
     {
         if (mustBeAliveToWin) canWin = false;
-        Utils.PlayerById(targetPlayer).IfPresent(p => MyPlayer.InteractWith(
-            p, new IndirectInteraction(
-                new FatalIntent(true,
-                    () => new CustomDeathEvent(p, MyPlayer, ModConstants.DeathNames.Cursed))
+        if (hasRevealed)
+            Utils.PlayerById(targetPlayer).IfPresent(p => MyPlayer.InteractWith(
+                    p, new IndirectInteraction(
+                        new FatalIntent(true,
+                            () => new CustomDeathEvent(p, MyPlayer, ModConstants.DeathNames.Cursed))
+                    )
                 )
-            )
-        );
+            );
+
         targetPlayer = byte.MaxValue;
         targetComponent?.Delete();
     }
