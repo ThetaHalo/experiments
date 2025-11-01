@@ -34,7 +34,8 @@ public class CTFGamemode : GameMode
     public override MatchData MatchData { get; set; }
     public CTFRoleAssignment RoleAssignment { get; }
 
-    public override BlockableGameAction BlockedActions() => BlockableGameAction.CallSabotage | BlockableGameAction.CallMeeting | BlockableGameAction.CloseDoors;
+    public override BlockableGameAction BlockedActions() => BlockableGameAction.CallSabotage | BlockableGameAction.CallMeeting
+        | BlockableGameAction.CloseDoors | BlockableGameAction.ReportBody;
     public override GameModeFlags GameFlags() => GameModeFlags.AllowChatDuringGame;
 
     // Red Team // Blue Team
