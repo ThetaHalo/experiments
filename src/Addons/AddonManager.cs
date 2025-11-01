@@ -28,6 +28,8 @@ public class AddonManager
     public static List<LotusAddon> Addons = new();
     public static Dictionary<byte, List<AddonInfo>> PlayerAddons = new();
 
+    public static readonly List<string> FailedAddons = [];
+
     internal static void ImportAddons()
     {
         #if ANDROID
@@ -54,7 +56,7 @@ public class AddonManager
             Type? lotusType = assembly.GetTypes().FirstOrDefault(t => t.IsAssignableTo(typeof(LotusAddon)));
             if (lotusType == null)
                 throw new ConstraintException($"Lotus Addons requires ONE class file that extends {nameof(LotusAddon)}");
-            LotusAddon addon = (LotusAddon)AccessTools.Constructor(lotusType).Invoke(Array.Empty<object>());
+            LotusAddon addon = (LotusAddon)AccessTools.Constructor(lotusType).Invoke([]);
 
             log.Log(AddonLL, $"Loading Addon [{addon.Name} {addon.Version}]", "AddonManager");
             Vents.Register(assembly);
@@ -66,6 +68,7 @@ public class AddonManager
         {
             log.Exception($"Error occured while loading addon. Addon File Name: {file.Name}", e);
             log.Exception(e);
+            FailedAddons.Add(file.Name + ".");
         }
     }
 
