@@ -27,6 +27,7 @@ public enum Override
     // Role specific overrides
     ShapeshiftDuration,
     ShapeshiftCooldown,
+    ShapeshifterEvidence,
 
     GuardianAngelDuration,
     GuardianAngelCooldown,
@@ -67,6 +68,7 @@ public static class OverrideExtensions
             Override.KillDistance => gameOptions.GetInt(Int32OptionNames.KillDistance),
             Override.ShapeshiftDuration => gameOptions.GetFloat(FloatOptionNames.ShapeshifterDuration),
             Override.ShapeshiftCooldown => gameOptions.GetFloat(FloatOptionNames.ShapeshifterCooldown),
+            Override.ShapeshifterEvidence => gameOptions.GetBool(BoolOptionNames.ShapeshifterLeaveSkin),
             Override.GuardianAngelDuration => gameOptions.GetFloat(FloatOptionNames.ProtectionDurationSeconds),
             Override.GuardianAngelCooldown => gameOptions.GetFloat(FloatOptionNames.GuardianAngelCooldown),
             Override.EngVentCooldown => gameOptions.GetFloat(FloatOptionNames.EngineerCooldown),
@@ -122,6 +124,7 @@ public static class OverrideExtensions
             Override.KillDistance => SetIntOption(Int32OptionNames.KillDistance, 0, 3),
             Override.ShapeshiftDuration => SetFloatOption(FloatOptionNames.ShapeshifterDuration),
             Override.ShapeshiftCooldown => SetFloatOption(FloatOptionNames.ShapeshifterCooldown, 0.01f),
+            Override.ShapeshifterEvidence => SetBoolOption(BoolOptionNames.ShapeshifterLeaveSkin),
             Override.GuardianAngelDuration => SetFloatOption(FloatOptionNames.ProtectionDurationSeconds),
             Override.GuardianAngelCooldown => SetFloatOption(FloatOptionNames.GuardianAngelCooldown),
             Override.EngVentCooldown => SetFloatOption(FloatOptionNames.EngineerCooldown),
