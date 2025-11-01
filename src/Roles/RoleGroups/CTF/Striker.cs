@@ -38,6 +38,7 @@ public class Striker : NeutralKillingBase, IRoleUI
     private Cooldown noticeTimer = null!;
     private Cooldown reviveTimer = null!;
     private Cooldown gameTimer = null!;
+    private Cooldown gracePeriod = null!;
 
     private bool overtimeActive;
     private bool suddenDeath;
@@ -47,6 +48,9 @@ public class Striker : NeutralKillingBase, IRoleUI
 
     [UIComponent(UI.Counter)]
     public string ReviveCooldownText() => reviveTimer.IsReady() ? "" : Color.yellow.Colorize(Translations.ReviveCooldown.Formatted(reviveTimer));
+
+    [UIComponent(UI.Text)]
+    public string GracePeriodText() => gracePeriod.IsReady() ? "" : Color.yellow.Colorize(Translations.ReviveCooldown.Formatted(gracePeriod));
 
     [UIComponent(UI.Text)]
     public string CurrentScore() => $"{Color.red.Colorize(CTFGamemode.Team0Score.ToString())} {Color.white.Colorize("|")} {Color.blue.Colorize(CTFGamemode.Team1Score.ToString())}";
@@ -76,6 +80,7 @@ public class Striker : NeutralKillingBase, IRoleUI
     private void RoundStart()
     {
         // Here we start all cooldowns and setup everything.
+        gracePeriod.SetDuration(ExtraGamemodeOptions.CaptureOptions.InvincibilityDuration);
         reviveTimer.SetDuration(ExtraGamemodeOptions.CaptureOptions.ReviveDuration);
         gameTimer.SetDuration(ExtraGamemodeOptions.CaptureOptions.GameLength);
 
@@ -106,16 +111,22 @@ public class Striker : NeutralKillingBase, IRoleUI
     public override bool TryKill(PlayerControl target)
     {
         if (MyPlayer.inVent || MyPlayer.walkingToVent) return false;
+        gracePeriod.Finish();
         return base.TryKill(target);
     }
 
     [RoleAction(LotusActionType.Interaction)]
     private void FakeDie(ActionHandle handle)
     {
-        if (suddenDeath) return; // dont revive on sudden death
+        if (suddenDeath)
+        {
+            // dont revive on sudden death
+            PutDownFlag(false);
+            return;
+        }
 
         handle.Cancel(); // Stops me from dying and does RpcMark.
-        if (reviveTimer.NotReady() || MyPlayer.inVent || MyPlayer.walkingToVent) return;
+        if (reviveTimer.NotReady() || gracePeriod.NotReady() || MyPlayer.inVent || MyPlayer.walkingToVent) return;
 
         Utils.Teleport(MyPlayer.NetTransform, new Vector2(Random.RandomRange(5000, 99999), Random.RandomRange(5000, 99999)));
         reviveTimer.StartThenRun(RevivePlayer);
@@ -178,6 +189,7 @@ public class Striker : NeutralKillingBase, IRoleUI
 
     private void RevivePlayer()
     {
+        gracePeriod.Start();
         Utils.Teleport(MyPlayer.NetTransform, CTFGamemode.SpawnLocations[MyPlayer.cosmetics.bodyMatProperties.ColorId]);
     }
 
@@ -308,6 +320,7 @@ public class Striker : NeutralKillingBase, IRoleUI
         [Localized(nameof(TakeButtonText))] public static string TakeButtonText = "Take";
 
         [Localized(nameof(ReviveCooldown))] public static string ReviveCooldown = "Reviving In: {0}";
+        [Localized(nameof(GracePeriodTime))] public static string GracePeriodTime = "Invincibility Leaving\nin: {0}";
         [Localized(nameof(GrabbedFlag))] public static string GrabbedFlag = "You grabbed the flag! The opposing team has arrows to your location!";
         [Localized(nameof(OvertimeTitle))] public static string OvertimeTitle = "<b>OVERTIME</b>";
         [Localized(nameof(OvertimeDeathMessage))] public static string OvertimeDeathMessage = "The host has enabled <b>'Sudden Death'</b> on Overtime, which means that respawning is disabled.";
